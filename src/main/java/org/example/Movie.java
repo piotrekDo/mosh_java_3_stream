@@ -3,10 +3,17 @@ package org.example;
 public class Movie {
     private String title;
     private int likes;
+    private Genre genre;
 
-    public Movie(String title, int likes) {
+    public Movie(String title, int likes, Genre genre) {
         this.title = title;
         this.likes = likes;
+        this.genre = genre;
+    }
+
+    @Override
+    public String toString() {
+        return this.title;
     }
 
     public String getTitle() {
@@ -23,5 +30,13 @@ public class Movie {
 
     public void setLikes(int likes) {
         this.likes = likes;
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
     }
 }

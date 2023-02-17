@@ -194,3 +194,28 @@ IntSummaryStatistics collect1 = movies.stream()
         
 IntSummaryStatistics{count=3, sum=45, min=10, average=15,000000, max=20}
 ```
+
+### Grupowanie danych
+Dane możemy grupować z pomocą metody ``Collectors.groupingBy`` w wyniku otrzymamy mapę z kluczem będącym obiektem wg. 
+którego grupujemy oraz wartością w postaci listy obiektów.
+```
+Map<Genre, List<Movie>> collect = movies.stream()
+        .collect(Collectors.groupingBy(Movie::getGenre));
+```
+Możemy przekazać też drugi argument w postaci ``Collector`` co pozwli zmienić rodzaj kolekcji dla wartości
+```
+Map<Genre, Set<Movie>> collect = movies.stream()
+        .collect(Collectors.groupingBy(Movie::getGenre, Collectors.toSet()));
+```
+Można również użyć również funkcji np. collect by uzyskać liczbę obiektów w danej kategorii.
+```
+Map<Genre, Long> collect2 = movies.stream()
+        .collect(Collectors.groupingBy(
+                Movie::getGenre, Collectors.counting()));
+```
+Inny ciekawy przykład pokazujący jak uzyskać film z największą ilością 'lajków' w swojej kategorii
+```
+Map<Genre, Movie> collect1 = movies.stream()
+        .collect(Collectors.toMap(Movie::getGenre, Function.identity(),
+                BinaryOperator.maxBy(Comparator.comparing(Movie::getLikes))));
+```
