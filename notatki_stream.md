@@ -219,3 +219,12 @@ Map<Genre, Movie> collect1 = movies.stream()
         .collect(Collectors.toMap(Movie::getGenre, Function.identity(),
                 BinaryOperator.maxBy(Comparator.comparing(Movie::getLikes))));
 ```
+
+### Dzielenie danych
+Z pomocą metody ``Collectors.partitioningBy`` możemy usyskać 2 kolekcje, odpowiednio dla true i false.
+```
+Map<Boolean, List<Movie>> collect3 = movies.stream()
+        .collect(Collectors.partitioningBy(m -> m.getLikes() > 15));
+        
+{false=[a, b], true=[c]}
+```

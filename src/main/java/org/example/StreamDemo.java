@@ -27,6 +27,9 @@ public class StreamDemo {
                         Movie::getGenre, Collectors.counting()
                 ));
 
-        System.out.println(collect1);
+        Map<Boolean, List<Movie>> collect3 = movies.stream()
+                .collect(Collectors.partitioningBy(m -> m.getLikes() > 15));
+
+        System.out.println(collect3);
     }
 }
