@@ -128,17 +128,22 @@ W taki sposób przekazujemy tytuł filmu do porównania, jako że klasa String i
   
 **sorted** pozwala uporządkować kolejność emelentów w strumieniu. Metoda isnieje w 2 przeciążeniach. Jeżeli nie przekażemy
 komparatora ``sorted`` wykorzysta naturany porządek określony przez implementację interfejsu ``Comparable``. Jeżeli chcemy
-odwrócić kolejność sortowania, możemy wykorzystać metodę ``reversed`` wywoływaną na komparatorze, za ``comparing``
+odwrócić kolejność sortowania, możemy wykorzystać metodę ``reversed`` wywoływaną na komparatorze, za ``comparing``  
+  
+**peek** to unikalna metoda pośrednia przyjmująca interfes ``Consumer`` pozwaljąca podejrzeć strumień w trakcie procesowania
+jest użyteczna przy debugowaniu.  
+  
+**W celu uzyskania unikalnych danych, bez duplikatów wywołujemy metodę pośrednią ``distinct``.** 
 
 ## Operacje terminalne
 Operacje terminalne zwracają końcowy wynik. Ich wywołanie powoduje wykonanie się wszystkich poprzedzających funkcji 
 pośrednich. Do operacji terminalnych zaliczamy:
 - ``toArray``
 - ``collect``
-- ``count``
 - ``reduce``
 - ``forEach``
 - ``forEachOrdered``
+- ``count``
 - ``min``
 - ``max``
 - ``anyMatch``
@@ -146,3 +151,46 @@ pośrednich. Do operacji terminalnych zaliczamy:
 - ``noneMatch``
 - ``findAny``
 - ``findFirst``
+
+### Reducers
+Jest to grupa operacji terminalnych zwracających jeden obiekt. Zaliczamy do nich:  
+**count** nie przyjmuje żadnych argumentów i zwraca long z liczbą elementów.  
+**anyMatch**, **allMatch** oraz **noneMatch** przyjmują ``Predicate`` i zwracją wartość boolean.  
+**findFirst** oraz **findAny** nie przyhmują argumentów i zwracają ``Optional``.  
+**max** oraz **min** zwracają ``Optional`` i przyjmują argument w postaci ``Comparator``.  
+
+### Reduce
+Metoda ``reduce()`` pozwala zwrócić pojedyńczą wartość. Metoda istnieje w trzech przeciążeniach. Najczęściej wykorzystujemy tę
+przyjmującą ``BinaryOperator``. Inna wersja przyjmuje dodatkowo parametr w postaci wartośći początkowej. ``BinaryOperator``
+pozwala skumulować wartości. Korzystając z metody przyjmującą wartość początkową w wyniku dostaniemy już ``Integer`` zamiast
+``Optional<Integer>``
+```
+Optional<Integer> reduce = movies.stream()
+        .map(movie -> movie.getLikes())
+        .reduce((x, y) -> x + y);
+```
+Poniżej przykład z ``identity`` oznaczającą wartość początkową. 
+```
+Integer reduce = movies.stream()
+        .map(movie -> movie.getLikes())
+        .reduce(0, (x, y) -> x + y);
+```
+
+### Collectors
+Metoda ``collect`` pozwala przekształcić strumień w kolekcję. Istnieje w dwóch przeciążeniach. Pierwsza, prostrza przyjmuje
+interfejs ``Collector`` pozwalający w wygodny sposób uzyskać potrzebną kolekcję, tablicę czy mapę. Drugi rodzaj przyjmuje
+``Supplier``, ``BiConsumer``, jako kumulator oraz ``BiConsumer`` jako combiner. Metoda ``toMap`` wymaga podania 2 funkcji
+określających klucz oraz wartość. Ciekawym zastosowaniem jest metoda ``Function.identity()`` zwracająca argument wejściowy
+co jest odpowiednie zapisowi ``movie -> movie``
+```
+Map<String, Movie> collect = movies.stream()
+        .collect(Collectors.toMap(Movie::getTitle, Function.identity()));
+```
+Inną metodą wartą uwagi jest ``Collectors.sumarizingInt`` lub inne wersje dla ``long`` czy ``double``. Metoda zwróci obiekt
+``...SummaryStatistics`` zawierający użyteczne dane
+```
+IntSummaryStatistics collect1 = movies.stream()
+        .collect(Collectors.summarizingInt(Movie::getLikes));
+        
+IntSummaryStatistics{count=3, sum=45, min=10, average=15,000000, max=20}
+```
